@@ -21,350 +21,375 @@ import pandas as pd
 
     
 ######################################################################### CATEGORIZE_COLS ###########################################################################
-def categorize_cols(df,cols,cuts):
-    """
-    Divide continuous columns into categories.
+
+############ ENCODERS ############
+class Encoder:
     
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        A dataframe with discrete/continuous columns we wish to categorize.
-        
-    cols : array_like
-        A list with the columns to be categorized.
-        
-    cuts : array_like
-        A list of length equal to the number of columns given in cols, containing the number of cuts to be done to each column.
-        
-    Returns
-    -------
-    df_ct : pandas.DataFrame
-        The Dataframe with the given columns divided in the number of categories given.
+    """
+    Encode tabular data using the functions the Encoder class provides.
 
     See Also
     --------
-    standardize_categorical_cols : Standardize the given categorical columns into the same format.
-    encode_df: Encode the given categorical columns into patterned strings.
-    
-    Notes
-    -----
-    This function uses the pd.cut function from the pandas library to categorize the given columns.
-    
+    encoder.categorize_cols : Divide continuous columns into categories.
+    encoder.standardize_categorical_cols : Standardize the given categorical columns into the same format.
+    encoder.encode_df: Encode the given categorical columns into patterned strings.
+
     Examples
     --------
     # Imports
-    >>> import zgli
-    >>> from sklearn import datasets
-    
-    # Load Iris df
-    >>> iris = datasets.load_iris()
-    >>> iris_df = pd.DataFrame(iris['data'])
-
-    # Encode iris df
-    >>> cols = [0,1,2,3]
-
-    # Divide iris df
-    >>> cuts = [4,4,4,4]
-    >>> df_ct = categorize_cols(iris_df,cols,cuts) # We use the categorize function here.
-    >>> df_ct.head()
-    		0		1		2		3
-    0	(4.296, 5.2]	(3.2, 3.8]	(0.994, 2.475]	(0.0976, 0.7]
-    1	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
-    2	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
-    3	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
-    4	(4.296, 5.2]	(3.2, 3.8]	(0.994, 2.475]	(0.0976, 0.7]
-
+    >>> from zgli import Encoder
+    >>> encoder = Encoder()
+    >>> encoder
+    <__main__.Encoder at 0x212d015c340>
     """
     
-    df_aux = df.copy()
+    def categorize_cols(df,cols,cuts):
+        """
+        Divide continuous columns into categories.
 
-    for i,col in enumerate(cols):
-        df_aux[col] = pd.cut(df_aux[col],cuts[i])
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            A dataframe with discrete/continuous columns we wish to categorize.
 
-    return df_aux
+        cols : array_like
+            A list with the columns to be categorized.
 
-def standardize_categorical_cols(df,cols):
-    
-    """
-    Standardize the given categorical columns into the same format.
-    
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        A dataframe with categorical columns we wish to standardize.
+        cuts : array_like
+            A list of length equal to the number of columns given in cols, containing the number of cuts to be done to each column.
+
+        Returns
+        -------
+        df_ct : pandas.DataFrame
+            The Dataframe with the given columns divided in the number of categories given.
+
+        See Also
+        --------
+        encoder.standardize_categorical_cols : Standardize the given categorical columns into the same format.
+        encoder.encode_df: Encode the given categorical columns into patterned strings.
+
+        Notes
+        -----
+        This function uses the pd.cut function from the pandas library to categorize the given columns.
+
+        Examples
+        --------
+        # Imports
+        >>> from zgli import Encoder
+        >>> from sklearn import datasets
+
+        # Load Iris df
+        >>> iris = datasets.load_iris()
+        >>> iris_df = pd.DataFrame(iris['data'])
+
+        # Define iris df cols
+        >>> cols = [0,1,2,3]
+
+        # Divide iris df
+        >>> cuts = [4,4,4,4]
+        >>> encoder = Encoder()
+        >>> df_ct = encoder.categorize_cols(iris_df,cols,cuts) # We use the categorize function here.
+        >>> df_ct.head()
+                0		1		2		3
+        0	(4.296, 5.2]	(3.2, 3.8]	(0.994, 2.475]	(0.0976, 0.7]
+        1	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
+        2	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
+        3	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
+        4	(4.296, 5.2]	(3.2, 3.8]	(0.994, 2.475]	(0.0976, 0.7]
+
+        """
+
+        df_aux = df.copy()
+
+        for i,col in enumerate(cols):
+            df_aux[col] = pd.cut(df_aux[col],cuts[i])
+
+        return df_aux
+
+    def standardize_categorical_cols(df,cols):
+
+        """
+        Standardize the given categorical columns into the same format.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            A dataframe with categorical columns we wish to standardize.
+
+        cols : list
+            A list with the columns to be standardized.
+
+        Returns
+        -------
+        df_st : pandas.DataFrame
+            The Dataframe with the given columns standardized.
+
+        See Also
+        --------
+        encoder.categorize_cols : Divide continuous columns into categories.
+        encoder.encode_df: Encode the given categorical columns into patterned strings.
+
+        Notes
+        -----
+        This function takes categorical columns and turns categories into a number sequence i.e [0,1[ becomes 0, [1,2[ becomes 1, etc... 
+        This happens to each column separately, so the same category [1,2[ of two different columns can be encoded as a 0 in the fisrt column, if
+        this is the first category in the column and as a 1 in the seccond column if it was the seccond category found in the column.
+
+        Examples
+        --------
+        # Imports
+        >>> from zgli import Encoder
+        >>> from sklearn import datasets
+
+        # Load Iris df
+        >>> iris = datasets.load_iris()
+        >>> iris_df = pd.DataFrame(iris['data'])
+
+        # Define iris df cols
+        >>> cols = [0,1,2,3]
+
+        # Divide iris df
+        >>> cuts = [4,4,4,4]
+        >>> encoder = Encoder()
+        >>> df_ct = encoder.categorize_cols(iris_df,cols,cuts)
+        >>> df_ct.head()
+                0		1		2		3
+        0	(4.296, 5.2]	(3.2, 3.8]	(0.994, 2.475]	(0.0976, 0.7]
+        1	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
+        2	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
+        3	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
+        4	(4.296, 5.2]	(3.2, 3.8]	(0.994, 2.475]	(0.0976, 0.7]
+
+        # Standardize df_div iris df
+        >>> df_std = encoder.standardize_categorical_cols(df_ct,cols) # We use the standardize function here.
+        >>> df_std.head()
+        0	1	2	3
+        0	0	2	0	0
+        1	0	1	0	0
+        2	0	1	0	0
+        3	0	1	0	0
+        4	0	2	0	0
+
+        """
+
+        df_aux = df.copy()
+
+        for i,col in enumerate(cols):
+
+            # Get unique values of current column
+            # Sort them from smaller to largest/alphabetically
+            # Conver to list to have access to .index function
+            unique_values = np.array(df_aux[col].unique())
+            unique_values = np.sort(unique_values)
+            unique_values = list(unique_values)
+
+            # Replace category by the index its index in the unique_values list
+            df_aux[col] = df_aux.apply(lambda row : unique_values.index(row[col]), axis = 1)
+
+        return df_aux
+
+    ############################################################################ ENCODE DF ############################################################################
+    def encode_df(df,cols,hop=1):
+
+        """
+        Encode the given categorical columns into patterned strings.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            A dataframe with standardized categorical columns obtained using the standardize_categorical_cols function.
+
+        cols : list
+            A list with the columns to be encoded.
+
+        hop : int
+            A number representing the the character difference between each patterned string. Ex: hop = 1 s1 = 000000 s2 = 010101 | hop = 2 s1 = 000000 s2 = 012012
+
+        Returns
+        -------
+        df_enc : pandas.DataFrame
+            The Dataframe with the given columns encoded.
+
+        See Also
+        --------
+        encoder.categorize_cols : Divide continuous columns into categories.
+        standardize_categorical_cols: Standardize the given categorical columns into the same format.
+
+        Notes
+        -----
+        This function takes standardized categorical columns and turns categories into patterned strings taking into account the hop given.
+
+        Examples
+        --------
+        # Imports
+        >>> from zgli import Encoder
+        >>> from sklearn import datasets
+
+        # Load Iris df
+        >>> iris = datasets.load_iris()
+        >>> iris_df = pd.DataFrame(iris['data'])
+
+        # Encode iris df
+        >>> cols = [0,1,2,3]
+
+        # Divide iris df
+        >>> cuts = [4,4,4,4]
+        >>> encoder = Encoder()
+        >>> df_ct = encoder.categorize_cols(iris_df,cols,cuts)
+        >>> df_ct.head()
+                0		1		2		3
+        0	(4.296, 5.2]	(3.2, 3.8]	(0.994, 2.475]	(0.0976, 0.7]
+        1	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
+        2	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
+        3	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
+        4	(4.296, 5.2]	(3.2, 3.8]	(0.994, 2.475]	(0.0976, 0.7]
+
+        # Standardize df_div iris df
+        >>> df_std = encoder.standardize_categorical_cols(df_ct,cols)
+        >>> df_std.head()
+        0	1	2	3
+        0	0	2	0	0
+        1	0	1	0	0
+        2	0	1	0	0
+        3	0	1	0	0
+        4	0	2	0	0
+
+        # Encode df
+        >>> hop = 1
+        >>> df_enc = encoder.encode_df(df_std,cols,hop) # We use the encoding function here.
+        >>> df_enc.head()
+                0		1		2		3
+        0	000000000000	012012012012	000000000000	000000000000
+        1	000000000000	010101010101	000000000000	000000000000
+        2	000000000000	010101010101	000000000000	000000000000
+        3	000000000000	010101010101	000000000000	000000000000
+        4	000000000000	012012012012	000000000000	000000000000
+
+        """
+
+        # Initialize vars
+        df_aux = df.copy()
+        alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+        n_classes = [df_aux[col].nunique() for col in cols]
+
+        # Error check
+        if max(n_classes) * hop > len(alphabet):
+            raise Exception("Number of classes * hop excedes alphabet size. Try reducing number of classes or hop value.")
+
+        # Define slice of alphabet to use. Get arr positions to calculate lcm to get size of strings.
+        alphabet_to_use = alphabet[:max(n_classes) * hop]
+        arr_positions = np.array(range(0,len(alphabet_to_use)+1,hop))
+        lcm = np.lcm.reduce(arr_positions[1:])
+        print('SEQUENCE SIZE: ',lcm)
+
+        # Generate string sequences (p.e 'abababababababab')
+        sequences = []
+        for position in arr_positions:
+            sequence = ''
+            while len(sequence) < lcm:
+                 sequence += alphabet_to_use[:position+1]
+            sequences.append(sequence)
+
+        # Encode dataframe
+        for col in cols:
+            df_aux[col] = df_aux[col].apply(lambda x: sequences[x])
+
+        return df_aux
+
+    ########################################################################## GENERATE FILES #########################################################################
+    def generate_files(df,file_cols, name_cols, out_path, sep = '', verbose = 1):
+
+        """
+        Generate text files given a dataframe.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            A dataframe with the content we intend to use to generate our files.
+
+        file_cols : array_like
+            A list with the columns to be used as the files content.
+
+        name_cols : array_like
+            A list with the columns to be used as the file name Ex: col1 = Blop col2= Guy then, file_name = Blop_Guy.txt.
+
+        out_path : string
+            The file path of the folder to where the generated files should be outputed to.
+
+        sep : string, default='' 
+            The character to be used to separete columns, default = '' i.e no character is introduced to separate the columns.
+
+        verbose : int, default=1 
+            Controls verbosity when generating files. Default is 1 so file name and file content are shown.
+
+        Outputs
+        -------
+        files : .txt
+            Text files containing the content of the 'file_cols' and named after the content inside the 'name_cols'.
+
+        See Also
+        --------
+        categorize_cols : Divide continuous columns into categories.
+        encode_df: Encode the given categorical columns into patterned strings.
+
+        Notes
+        -----
+        This function may have issues generating the files if the the user does not have access permission to the out_path provided.
+        If there is trouble with the finding/accessing the out_path, try changing it to something the user has access for sure.
+
+        Examples
+        --------
+        # Example Dataframe
+        >>> d = {'col1': ['First', 'Second'], 'col2': ['File', 'File'], 'col3': [':)', ':D']}
+        >>> df = pd.DataFrame(data=d)
+
+        # Define parameters
+        >>> file_cols = ['col1','col2','col3']
+        >>> name_cols = ['col1','col2']
+        >>> out_path = 'D:/output/'
+        >>> sep = ' '
+
+        # Generate files
+        >>> generate_files(df,file_cols, name_cols, out_path, sep) # We use the generate funtion here
+        Generating files...
+        ######################
+        File:  First_File.txt
+        First File :) 
+        ######################
+        File:  Second_File.txt
+        Second File :D 
+
+        Done.
+
+        """
+
+        cols = file_cols
+        print('Generating files...')
+        for row in df.iterrows():
+
+            name = ''
+            for n in name_cols:
+                name = name + str(row[1][n]) + '_'
+            name = name[:len(name) -1] + '.txt'
+
+            if sep == '':
+                file_content = ''.join(row[1][cols].values)
+            else:
+                file_content = ''.join(row[1][cols].values + sep)
+
+            file_path = os.path.join(out_path,name)
+            with open(file_path, 'w') as f:
+                f.write(file_content)
+
+            if verbose == 1:
+                print('######################')
+                print('File: ', name)
+                print(file_content)
+
+        print('\nDone.')
         
-    cols : array_like
-        A list with the columns to be standardized.
-        
-    Returns
-    -------
-    df_st : pandas.DataFrame
-        The Dataframe with the given columns standardized.
 
-    See Also
-    --------
-    categorize_cols : Divide continuous columns into categories.
-    encode_df: Encode the given categorical columns into patterned strings.
-    
-    Notes
-    -----
-    This function takes categorical columns and turns categories into a number sequence i.e [0,1[ becomes 0, [1,2[ becomes 1, etc... 
-    This happens to each column separately, so the same category [1,2[ of two different columns can be encoded as a 0 in the fisrt column, if
-    this is the first category in the column and as a 1 in the seccond column if it was the seccond category found in the column.
-    
-    Examples
-    --------
-    # Imports
-    >>> import zgli
-    >>> from sklearn import datasets
-    
-    # Load Iris df
-    >>> iris = datasets.load_iris()
-    >>> iris_df = pd.DataFrame(iris['data'])
-
-    # Encode iris df
-    >>> cols = [0,1,2,3]
-
-    # Divide iris df
-    >>> cuts = [4,4,4,4]
-    >>> df_ct = categorize_cols(iris_df,cols,cuts)
-    >>> df_ct.head()
-    		0		1		2		3
-    0	(4.296, 5.2]	(3.2, 3.8]	(0.994, 2.475]	(0.0976, 0.7]
-    1	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
-    2	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
-    3	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
-    4	(4.296, 5.2]	(3.2, 3.8]	(0.994, 2.475]	(0.0976, 0.7]
-    
-    # Standardize df_div iris df
-    >>> df_std = standardize_categorical_cols(df_ct,cols) # We use the standardize function here.
-    >>> df_std.head()
-    0	1	2	3
-    0	0	2	0	0
-    1	0	1	0	0
-    2	0	1	0	0
-    3	0	1	0	0
-    4	0	2	0	0
-
-    """
-
-    df_aux = df.copy()
-
-    for i,col in enumerate(cols):
-        
-        # Get unique values of current column
-        # Sort them from smaller to largest/alphabetically
-        # Conver to list to have access to .index function
-        unique_values = np.array(df_aux[col].unique())
-        unique_values = np.sort(unique_values)
-        unique_values = list(unique_values)
-        
-        # Replace category by the index its index in the unique_values list
-        df_aux[col] = df_aux.apply(lambda row : unique_values.index(row[col]), axis = 1)
-
-    return df_aux
-
-############################################################################ ENCODE DF ############################################################################
-def encode_df(df,cols,hop=1):
-
-    """
-    Encode the given categorical columns into patterned strings.
-    
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        A dataframe with standardized categorical columns obtained using the standardize_categorical_cols function.
-        
-    cols : array_like
-        A list with the columns to be encoded.
-        
-    hop : int
-        A number representing the the character difference between each patterned string. Ex: hop = 1 s1 = 000000 s2 = 010101 | hop = 2 s1 = 000000 s2 = 012012
-        
-    Returns
-    -------
-    files : pandas.DataFrame
-        The Dataframe with the given columns encoded.
-
-    See Also
-    --------
-    categorize_cols : Divide continuous columns into categories.
-    encode_df: Encode the given categorical columns into patterned strings.
-    
-    Notes
-    -----
-    This function takes standardized categorical columns and turns categories into patterned strings taking into account the hop given.
-    
-    Examples
-    --------
-    # Imports
-    >>> import zgli
-    >>> from sklearn import datasets
-    
-    # Load Iris df
-    >>> iris = datasets.load_iris()
-    >>> iris_df = pd.DataFrame(iris['data'])
-
-    # Encode iris df
-    >>> cols = [0,1,2,3]
-
-    # Divide iris df
-    >>> cuts = [4,4,4,4]
-    >>> df_ct = categorize_cols(iris_df,cols,cuts)
-    >>> df_ct.head()
-    		0		1		2		3
-    0	(4.296, 5.2]	(3.2, 3.8]	(0.994, 2.475]	(0.0976, 0.7]
-    1	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
-    2	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
-    3	(4.296, 5.2]	(2.6, 3.2]	(0.994, 2.475]	(0.0976, 0.7]
-    4	(4.296, 5.2]	(3.2, 3.8]	(0.994, 2.475]	(0.0976, 0.7]
-    
-    # Standardize df_div iris df
-    >>> df_std = standardize_categorical_cols(df_ct,cols)
-    >>> df_std.head()
-    0	1	2	3
-    0	0	2	0	0
-    1	0	1	0	0
-    2	0	1	0	0
-    3	0	1	0	0
-    4	0	2	0	0
-    
-    # Encode df
-    >>> hop = 1
-    >>> df_enc = encode_df(df_std,cols,hop) # We use the encoding function here.
-    >>> df_enc.head()
-    		0		1		2		3
-    0	000000000000	012012012012	000000000000	000000000000
-    1	000000000000	010101010101	000000000000	000000000000
-    2	000000000000	010101010101	000000000000	000000000000
-    3	000000000000	010101010101	000000000000	000000000000
-    4	000000000000	012012012012	000000000000	000000000000
-    
-    """
-    
-    # Initialize vars
-    df_aux = df.copy()
-    alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-    n_classes = [df_aux[col].nunique() for col in cols]
-
-    # Error check
-    if max(n_classes) * hop > len(alphabet):
-        raise Exception("Number of classes * hop excedes alphabet size. Try reducing number of classes or hop value.")
-
-    # Define slice of alphabet to use. Get arr positions to calculate lcm to get size of strings.
-    alphabet_to_use = alphabet[:max(n_classes) * hop]
-    arr_positions = np.array(range(0,len(alphabet_to_use)+1,hop))
-    lcm = np.lcm.reduce(arr_positions[1:])
-    print('SEQUENCE SIZE: ',lcm)
-
-    # Generate string sequences (p.e 'abababababababab')
-    sequences = []
-    for position in arr_positions:
-        sequence = ''
-        while len(sequence) < lcm:
-             sequence += alphabet_to_use[:position+1]
-        sequences.append(sequence)
-
-    # Encode dataframe
-    for col in cols:
-        df_aux[col] = df_aux[col].apply(lambda x: sequences[x])
-
-    return df_aux
-
-########################################################################## GENERATE FILES #########################################################################
-def generate_files(df,file_cols, name_cols, out_path, sep = '', verbose = 1):
-    
-    """
-    Generate text files given a dataframe.
-    
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        A dataframe with the content we intend to use to generate our files.
-        
-    file_cols : array_like
-        A list with the columns to be used as the files content.
-        
-    name_cols : array_like
-        A list with the columns to be used as the file name Ex: col1 = Blop col2= Guy then, file_name = Blop_Guy.txt.
-        
-    out_path : string
-        The file path of the folder to where the generated files should be outputed to.
-        
-    sep : string, default='' 
-        The character to be used to separete columns, default = '' i.e no character is introduced to separate the columns.
-        
-    verbose : int, default=1 
-        Controls verbosity when generating files. Default is 1 so file name and file content are shown.
-        
-    Outputs
-    -------
-    files : .txt
-        Text files containing the content of the 'file_cols' and named after the content inside the 'name_cols'.
-
-    See Also
-    --------
-    categorize_cols : Divide continuous columns into categories.
-    encode_df: Encode the given categorical columns into patterned strings.
-    
-    Notes
-    -----
-    This function may have issues generating the files if the the user does not have access permission to the out_path provided.
-    If there is trouble with the finding/accessing the out_path, try changing it to something the user has access for sure.
-    
-    Examples
-    --------
-    # Example Dataframe
-    >>> d = {'col1': ['First', 'Second'], 'col2': ['File', 'File'], 'col3': [':)', ':D']}
-    >>> df = pd.DataFrame(data=d)
-
-    # Define parameters
-    >>> file_cols = ['col1','col2','col3']
-    >>> name_cols = ['col1','col2']
-    >>> out_path = 'D:/output/'
-    >>> sep = ' '
-
-    # Generate files
-    >>> generate_files(df,file_cols, name_cols, out_path, sep) # We use the generate funtion here
-    Generating files...
-    ######################
-    File:  First_File.txt
-    First File :) 
-    ######################
-    File:  Second_File.txt
-    Second File :D 
-
-    Done.
-    
-    """
-    
-    cols = file_cols
-    print('Generating files...')
-    for row in df.iterrows():
-
-        name = ''
-        for n in name_cols:
-            name = name + str(row[1][n]) + '_'
-        name = name[:len(name) -1] + '.txt'
-
-        if sep == '':
-            file_content = ''.join(row[1][cols].values)
-        else:
-            file_content = ''.join(row[1][cols].values + sep)
-
-        file_path = os.path.join(out_path,name)
-        with open(file_path, 'w') as f:
-            f.write(file_content)
-            
-        if verbose == 1:
-            print('######################')
-            print('File: ', name)
-            print(file_content)
-    
-    print('\nDone.')
-        
-
-############ ZGLI ############
+############ FOLDER ############
 class Folder:
        
     class Raw:
@@ -377,7 +402,7 @@ class Folder:
         """
         Folder
         
-        Perform operations inside the folder containing the files intended for clustering
+        Perform operations inside the folder containing the files intended for clustering.
         
         Parameters
         ----------
@@ -529,8 +554,8 @@ class Folder:
         
         Returns
         -------
-        file_lengths : dict{}
-            The name name of all files text inside the folder algongside their length i.e their number of rows.
+        file_sizes : dict{}
+            The name name of all files text inside the folder algongside their size i.e their number of characters.
             
         See Also
         --------
@@ -811,13 +836,14 @@ class Folder:
         
         Parameters
         ----------
-        compressor : {'zlib','gzip','bzlib','lzma','raw'}
+        compressor : {'zlib','gzip','bzlib','lzma','raw'},
             Wich compressor to use. Diferent compressors may yield diferent results when clustering.
             
             - 'zlib' produces asymmetrical matrices and smaller sizes for small strings.
             - 'gzip'  has simillar behavior to zlib (normally with bigger compressed sizes).
             - 'bzlib' produces symmetrical matrices and is recomended when using data that was encoded using the zgli.encode_df function.
             - 'lzma' usually produces the most compressed sizes.
+            - 'raw' uses the raw file sizes i.e files do not get compressed.
             
         output_path : string, default=None 
             The file path of the to where the distance matrix should be outputed.
@@ -831,7 +857,7 @@ class Folder:
         weights : list, default=None
             A product between weight[i] and column[i] is computed if weights are provided. Default is none i.e all columns have weight = 1.
             
-        verbose : int, default=1 
+        verbose : int, default=False 
             Controls verbosity when generating files. Default is 1 so the distance matrix is shown.
         
         Returns
@@ -945,10 +971,3 @@ class Folder:
             print('Amp: ', round(amp,6))
             
         return distance_matrix
-
-
-# In[ ]:
-
-
-
-
