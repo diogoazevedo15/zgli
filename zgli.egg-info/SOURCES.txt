@@ -1,0 +1,12 @@
+LICENSE
+README.md
+pyproject.toml
+setup.cfg
+zgli/__init__.py
+zgli/encoder.py
+zgli/folder.py
+zgli.egg-info/PKG-INFO
+zgli.egg-info/SOURCES.txt
+zgli.egg-info/dependency_links.txt
+zgli.egg-info/requires.txt
+zgli.egg-info/top_level.txt
