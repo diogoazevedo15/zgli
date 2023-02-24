@@ -5,6 +5,7 @@ setup.cfg
 zgli/__init__.py
 zgli/encoder.py
 zgli/folder.py
+zgli/tree.py
 zgli.egg-info/PKG-INFO
 zgli.egg-info/SOURCES.txt
 zgli.egg-info/dependency_links.txt
